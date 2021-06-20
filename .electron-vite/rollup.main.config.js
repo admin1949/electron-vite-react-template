@@ -5,6 +5,7 @@ const esbuild = require("rollup-plugin-esbuild");
 const alias = require('@rollup/plugin-alias');
 const json = require('@rollup/plugin-json')
 const { RollupOptions } = require('rollup');
+const replace = require('rollup-plugin-replace');
 
 const input = resolve(__dirname, '../src/main/index.ts');
 const output = resolve(__dirname, '../dist/electron/main/main.js')
@@ -34,7 +35,7 @@ module.exports = (env = 'production') => {
             esbuild({
                 include: /\.[jt]sx?$/,
                 exclude: /node_modules/,
-                sourcemap: false,
+                sourcemap: !isProduction,
                 minify: isProduction,
                 target: 'es2017',
                 define: {
@@ -47,9 +48,16 @@ module.exports = (env = 'production') => {
             }),
             alias({
                 entries: [
-                    { find: '@main', replacement: resolve('../src/main') },
-                    { find: '@config', replacement: resolve('../config') }
-                ]
+                    { find: '@main', replacement: resolve(__dirname, '../src/main') },
+                    { find: '@config', replacement: resolve(__dirname, '../config') },
+                    { find: '@publicEnum', replacement: resolve(__dirname, '../src/publicEnum') },
+                ],
+                customResolver: nodeResolve({
+                    extensions: [ '.ts', '.json' ]
+                })
+            }),
+            replace({
+                'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
             })
         ],
         external: [

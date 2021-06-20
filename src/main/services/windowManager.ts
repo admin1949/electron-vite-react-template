@@ -3,6 +3,9 @@ import { winURL, loadURL, isDevelopment } from '../config/staticPath';
 import { menuConfig } from '../config/menu';
 import { MessageBoxOptions } from 'electron/common';
 import { connectIpcServer } from './ipcMain';
+import { updateHandle } from './checkUpdate';
+
+let waitLoadWindow = Promise.resolve();
 
 export default class MainInit {
     public winURL: string = '';
@@ -38,7 +41,7 @@ export default class MainInit {
                 contextIsolation: false,
                 nodeIntegration: true,
                 webSecurity: false,
-                devTools: isDevelopment,
+                devTools: true,
                 scrollBounce: process.platform === 'darwin',
             }
         });
@@ -47,10 +50,19 @@ export default class MainInit {
 
         this.mainWindow.loadURL(this.winURL);
 
+        updateHandle.setMainWindow(this.mainWindow);
+
         connectIpcServer(this.mainWindow);
 
+
         this.mainWindow.webContents.once('dom-ready', () => {
-            this.mainWindow!.show();
+            waitLoadWindow.finally(() => {
+                if (null !== this.loadWindow) {
+                    this.loadWindow.close();
+                    this.loadWindow = null;
+                }
+                this.mainWindow!.show();
+            })
         });
 
         if (isDevelopment) {
@@ -129,7 +141,30 @@ export default class MainInit {
         })
     }
 
+    createLoadingWindow() {
+        if (null !== this.loadWindow) {
+            this.loadWindow.close();
+        }
+        this.loadWindow = new BrowserWindow({
+            width: 900,
+            height: 350,
+            frame: false,
+            transparent: true,
+            resizable: false,
+            webPreferences: {
+                nodeIntegration: true,
+            }
+        });
+        this.loadWindow.loadURL(this.startURL);
+        this.loadWindow.show();
+        this.loadWindow.setAlwaysOnTop(true);
+        waitLoadWindow = new Promise((res) => {
+            setTimeout(res, 3000);
+        });
+    }
+
     initWindow() {
+        this.createLoadingWindow();
         return this.createMainWindow();
     }
 }

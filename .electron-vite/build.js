@@ -1,6 +1,7 @@
 'use strict';
 
 process.env.NODE_ENV = 'production'
+process.env.CRYPTO_EXTENSION = 'jsxm';
 
 const path = require('path');
 const rollup = require('rollup');
@@ -8,7 +9,8 @@ const { compileFile } = require('bytenode');
 
 const { default: nodeResolve } = require("@rollup/plugin-node-resolve");
 const commonjs = require('@rollup/plugin-commonjs');
-const esbuild = require('rollup-plugin-esbuild');
+const replace = require('rollup-plugin-replace')
+const { terser } = require('rollup-plugin-terser');
 
 const { build } = require('vite');
 const renderOptions = require('./vite.config');
@@ -50,7 +52,7 @@ function main(){
         });
 
     mulitTask.once('done', async () => {
-        byteScripts(showByteScripts);
+        // byteScripts(showByteScripts);
     })
 }
 
@@ -73,9 +75,10 @@ function byteScripts(scripts) {
                 browser: true,
             }),
             commonjs(),
-            esbuild({
-                minify: true,
-            })
+            terser(),
+            replace({
+                'process.env.CRYPTO_EXTENSION': JSON.stringify(process.env.CRYPTO_EXTENSION),
+            }),
         ],
         external: [ RegExp(`${cryptoExtension}$`) ],
     }).then(build => {

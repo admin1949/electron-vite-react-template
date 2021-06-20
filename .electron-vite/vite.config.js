@@ -12,6 +12,7 @@ module.exports = defineConfig({
     resolve: {
         alias: {
             "@render": root,
+            "@publicEnum": resolve('src/publicEnum')
         },
     },
     base: './',

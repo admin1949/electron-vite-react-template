@@ -1,5 +1,6 @@
 import { ipcMain, dialog, BrowserWindow } from 'electron';
 import { MessageBoxOptions } from 'electron/main';
+import { SYSTEM_SIGNAL } from '@publicEnum/system';
 
 export const connectIpcServer = (mainWindow: BrowserWindow) => {
     ipcMain.handle('windows-mini', async () => {
@@ -32,5 +33,12 @@ export const connectIpcServer = (mainWindow: BrowserWindow) => {
 
     ipcMain.handle('hot-update', async () => {
         console.log('hot update');
+    });
+
+    ipcMain.handle(SYSTEM_SIGNAL.OPEN_DEV_TOOLS_REQUEST, () => {
+        mainWindow.webContents.openDevTools({
+            mode: 'right'
+        });
+        mainWindow.webContents.send(SYSTEM_SIGNAL.OPEN_DEV_TOOLS_SUCCESS);
     })
 }
