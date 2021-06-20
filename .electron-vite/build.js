@@ -2,26 +2,26 @@
 
 process.env.NODE_ENV = 'production'
 
-const { resolve: join } = require('path');
-const createMainProcessOptions = require('./rollup.main.config');
+const path = require('path');
 const rollup = require('rollup');
-const mainOpt = createMainProcessOptions(process.env.NODE_ENV);
-const fs = require('fs');
+const { compileFile } = require('bytenode');
+
 const { default: nodeResolve } = require("@rollup/plugin-node-resolve");
 const commonjs = require('@rollup/plugin-commonjs');
+const esbuild = require('rollup-plugin-esbuild');
 
 const { build } = require('vite');
 const renderOptions = require('./vite.config');
 
-const ByteNode = require('bytenode');
+const createMainProcessOptions = require('./rollup.main.config');
+const mainOpt = createMainProcessOptions(process.env.NODE_ENV);
 
-const resolve = (path) => join(__dirname, '..', path);
+const resolve = (path1) => path.join(__dirname, '..', path1);
 
 const Multispinner = require('multispinner');
 main();
 
 function main(){
-
     const tasks = ['main', 'render'];
     const mulitTask = new Multispinner(tasks, {
         preText: 'building',
@@ -59,60 +59,49 @@ const showByteScripts = [
     // resolve('dist/electron/render/index.js'),
 ]
 
-// byteScripts(showByteScripts);
-
 /**
  * 
  * @param {string[]} scripts 
  */
 function byteScripts(scripts) {
-    scripts.map(src => {
-        const target = src.split('\\');
-        const originFileName = target.pop();
-        const targetFileName = originFileName.split('.');
-
-        targetFileName[targetFileName.length - 1] = 'jshxd';
-
-        const fileName = targetFileName.join('.');
-        target.push(fileName);
-
-        return {
-            src: src,
-            target: target.join('\\'),
-            originFileName,
-            fileName: fileName,
-        }
-    }).forEach( async ({ src, fileName }) => {
-        try {
-            await ByteNode.compileFile({
+    const cryptoExtension = `.${process.env.CRYPTO_EXTENSION || 'jsc'}`;
+    rollup.rollup({
+        input: resolve('.electron-vite/bytenode.runtime.js'),
+        plugins: [
+            nodeResolve({
+                preferBuiltins: true,
+                browser: true,
+            }),
+            commonjs(),
+            esbuild({
+                minify: true,
+            })
+        ],
+        external: [ RegExp(`${cryptoExtension}$`) ],
+    }).then(build => {
+        scripts.map(src => {
+            const origin = path.parse(src);
+    
+            const targetFileName = origin.base.replace(origin.ext, cryptoExtension);
+            const targetPath = src.replace(origin.base, targetFileName);
+    
+            return {
+                src: src,
+                fileName: targetFileName,
+                target: targetPath,
+            }
+        }).forEach(async ({ src, fileName, target }) => {
+            await compileFile({
                 filename: src,
                 electron: true,
+                output: target,
             });
-            const template = (await fs.promises.readFile(join(__dirname, './bytenode.template'))).toString();
-            await fs.promises.writeFile(src, template);
-
-            rollup.rollup({
-                input: src,
-                plugins: [
-                    nodeResolve({
-                        preferBuiltins: true,
-                        browser: true,
-                    }),
-                    commonjs(),
-                ],
-                external: [ /.jshxd$/ ],
-            }).then(build => {
-                console.log(build.code)
-                build.write({
-                    file: src,
-                    format: 'cjs',
-                    exports: 'auto',
-                    footer: `;require("${ `./${fileName}`}")`,
-                },);
-            })
-        } catch(err) {
-            console.log(err);
-        }
-        console.log(`build ${src} success`);
-    })
+            build.write({
+                file: src,
+                format: 'cjs',
+                exports: 'auto',
+                outro: `require("${ `./${fileName}`}");`,
+            },)
+        });
+    });
 }
