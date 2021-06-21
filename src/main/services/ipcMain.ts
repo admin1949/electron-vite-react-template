@@ -1,6 +1,8 @@
-import { ipcMain, dialog, BrowserWindow } from 'electron';
+import { ipcMain, dialog, BrowserWindow, app } from 'electron';
 import { MessageBoxOptions } from 'electron/main';
 import { SYSTEM_SIGNAL } from '@publicEnum/system';
+import { HOT_UPDATE_SIGNAL } from '@publicEnum/update';
+import { hopUpdateHandle } from '@main/services/hotUpdate';
 
 export const connectIpcServer = (mainWindow: BrowserWindow) => {
     ipcMain.handle('windows-mini', async () => {
@@ -31,8 +33,15 @@ export const connectIpcServer = (mainWindow: BrowserWindow) => {
         return await dialog.showMessageBox(Object.assign(defaultOptions, arg));
     });
 
-    ipcMain.handle('hot-update', async () => {
+    ipcMain.handle(HOT_UPDATE_SIGNAL.CHECK_HOT_UPDATE, async () => {
+        hopUpdateHandle.run();
         console.log('hot update');
+    });
+
+    ipcMain.handle(HOT_UPDATE_SIGNAL.CONFIRM_HOT_UPDATE, async () => {
+        console.log('退出重启');
+        app.relaunch();
+        app.exit();
     });
 
     ipcMain.handle(SYSTEM_SIGNAL.OPEN_DEV_TOOLS_REQUEST, () => {

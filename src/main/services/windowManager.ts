@@ -4,6 +4,7 @@ import { menuConfig } from '../config/menu';
 import { MessageBoxOptions } from 'electron/common';
 import { connectIpcServer } from './ipcMain';
 import { updateHandle } from './checkUpdate';
+import { hopUpdateHandle } from '@main/services/hotUpdate';
 
 let waitLoadWindow = Promise.resolve();
 
@@ -51,6 +52,7 @@ export default class MainInit {
         this.mainWindow.loadURL(this.winURL);
 
         updateHandle.setMainWindow(this.mainWindow);
+        hopUpdateHandle.setMainWindow(this.mainWindow);
 
         connectIpcServer(this.mainWindow);
 

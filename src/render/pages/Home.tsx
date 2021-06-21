@@ -1,11 +1,11 @@
 import React from "react";
-const { ipcRenderer } = require('electron');
 import { DesktopMsg } from '@render/tools/notification';
+import {HOT_UPDATE_SIGNAL  } from '@publicEnum/update';
+const { ipcRenderer } = require('electron');
 
 export const Home = () => {
     const hotUpdate = () => {
-        // const res = ipcRenderer.invoke('hot-update')
-        // console.log(res);
+        ipcRenderer.invoke(HOT_UPDATE_SIGNAL.CHECK_HOT_UPDATE);
     }
 
     const openMainProcessDialog = () => {

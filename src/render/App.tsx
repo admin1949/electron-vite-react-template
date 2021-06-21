@@ -24,6 +24,7 @@ export const App = () => {
             </nav>
         </Sider>
         <Content>
+           <h1>this is old project</h1>
             <Switch>
                 <Route path="/about">
                     <About/>

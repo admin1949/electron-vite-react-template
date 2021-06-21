@@ -28,7 +28,8 @@ module.exports = (env = 'production') => {
         plugins: [
             nodeResolve({
                 preferBuiltins: true,
-                browser: true,
+                browser: false,
+                jsnext: true,
             }),
             commonjs(),
             json(),

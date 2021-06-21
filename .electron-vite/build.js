@@ -6,6 +6,7 @@ process.env.CRYPTO_EXTENSION = 'jsxm';
 const path = require('path');
 const rollup = require('rollup');
 const { compileFile } = require('bytenode');
+const { emptyDir } = require('fs-extra');
 
 const { default: nodeResolve } = require("@rollup/plugin-node-resolve");
 const commonjs = require('@rollup/plugin-commonjs');
@@ -23,7 +24,11 @@ const resolve = (path1) => path.join(__dirname, '..', path1);
 const Multispinner = require('multispinner');
 main();
 
-function main(){
+async function main(){
+    await Promise.all([
+        emptyDir(resolve('dist')),
+        emptyDir(resolve('build')),
+    ]);
     const tasks = ['main', 'render'];
     const mulitTask = new Multispinner(tasks, {
         preText: 'building',
@@ -52,7 +57,7 @@ function main(){
         });
 
     mulitTask.once('done', async () => {
-        // byteScripts(showByteScripts);
+        byteScripts(showByteScripts);
     })
 }
 
