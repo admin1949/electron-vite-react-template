@@ -1,12 +1,14 @@
 import { autoUpdater } from 'electron-updater';
 import { ipcMain, BrowserWindow } from 'electron';
 import { UPDATE_STATUS, UPDATE_SIGNAL } from '@publicEnum/update';
+import { hotUpdate } from '../../../config/config.json';
+import { arch } from 'os';
 
 class Update {
     private mainWindow: BrowserWindow | null
     constructor() {
         this.mainWindow = null;
-        autoUpdater.setFeedURL('http://127.0.0.1:25565');
+        autoUpdater.setFeedURL(`${hotUpdate.downloadUrl}${arch()}`);
 
         this.registCheckUpdate();
         this.registQuitAndInstall();

@@ -1,0 +1,19 @@
+{
+    "hotUpdate": {
+        "downloadUrl": "http://1m37.cn/the-answer/",
+        "configFileName": "latest-hotupdate.yml",
+        "publishUrl": "",
+        "localTempFolderName": "temp"
+    },
+    "dev": {
+        "env": {
+            "NODE_ENV": "development"
+        },
+        "viteServerPort": 9080
+    },
+    "build": {
+        "env": {
+            "NODE_ENV": "production"
+        }
+    }
+}

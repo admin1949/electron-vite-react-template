@@ -1,9 +1,11 @@
-import React from "react";
+import React, { createContext } from "react";
 import ReactDOM from "react-dom";
 import '@render/assets/common.less';
-import '@render/tools/update';
 import { HashRouter as Router } from 'react-router-dom';
 import { App } from '@render/App';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/nord.css';
+
 
 ReactDOM.render(
     <React.StrictMode>

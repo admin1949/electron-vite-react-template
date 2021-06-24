@@ -1,0 +1,61 @@
+.flex-row{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+.flex-colum{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+@font-size-base: 16px;
+.nav-bar{
+    height: 100%;
+    font-size: @font-size-base + 4;
+    color: #adadad;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    user-select: none;
+    .header{
+        padding: 12px 8px;
+    }
+    .footer{
+        height: 64px;
+        .flex-row;
+        justify-content: center;
+        background-color: rgba(55,65,81,1);
+        cursor: pointer;
+    }
+    .icon{
+        font-size: @font-size-base + 6;
+    }
+    .icon+span{
+        margin-left: 8px;
+    }
+    &-app{
+        .icon{
+            font-size: @font-size-base + 8;
+        }
+        font-size: @font-size-base + 6;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 0 4px;
+    }
+    &-item{
+        cursor: pointer;
+        margin-top: 12px;
+        border-radius: 4px;
+        height: 48px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 12px;
+        color: #adadad;
+        transition: background-color ease-out .25s;
+        &.active, &:hover{
+            background-color: rgba(55,65,81,1);
+        }    
+    }
+}

@@ -10,7 +10,9 @@ import extract from 'extract-zip';
 import { load} from 'js-yaml';
 import { gte } from 'semver';
 import { version } from '../../../package.json';
+import { hotUpdate } from '../../../config/config.json';
 import { HOT_UPDATE_STATUS, HOT_UPDATE_SIGNAL } from '@publicEnum/update'
+import { BaseServices } from './baseServices';
 
 const request = axios.create();
 const appPath = app.getAppPath();
@@ -18,8 +20,8 @@ const updatePath = resolve(appPath, '../../update');
 const streamPipline = promisify(pipeline);
 
 const hotUpdateConfig = {
-    url: `http://127.0.0.1:25565/hotupdate/${arch()}/`,
-    configName: 'latest.yml',
+    url: `${hotUpdate.downloadUrl}/${arch()}/`,
+    configName: hotUpdate.configFileName,
 }
 
 type LatestInfo = {
@@ -42,26 +44,10 @@ const hash = (data: any, type = 'sha512', key = "c3e343ddff957cec09fd") => {
     return hmac.digest('hex');
 }
 
-class HotUpdate {
-    protected mainWindow: BrowserWindow | null = null;
+class HotUpdate extends BaseServices<HOT_UPDATE_STATUS> {
     protected isRunHotUpdate: boolean = false;
     constructor() {
-
-    }
-    public setMainWindow(mainWindow: BrowserWindow) {
-        this.mainWindow = mainWindow;
-        return this;
-    }
-
-    protected sendMessage(code: HOT_UPDATE_STATUS, msg?: any) {
-        if (null === this.mainWindow) {
-            return;
-        }
-
-        this.mainWindow.webContents.send(HOT_UPDATE_SIGNAL.HOT_UPDATE_MSG, {
-            code,
-            msg,
-        })
+        super(HOT_UPDATE_SIGNAL.HOT_UPDATE_MSG);
     }
 
     async run() {
@@ -98,7 +84,7 @@ class HotUpdate {
 
             await emptyDir(appPath);
             copy(appPathTemp, appPath);
-            this.sendMessage(HOT_UPDATE_STATUS.SUCCESS);
+            this.sendMessage(HOT_UPDATE_STATUS.WAIT_RELAUNCH);
 
         } catch(err) {
             console.error(err);

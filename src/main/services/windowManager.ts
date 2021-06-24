@@ -5,8 +5,11 @@ import { MessageBoxOptions } from 'electron/common';
 import { connectIpcServer } from './ipcMain';
 import { updateHandle } from './checkUpdate';
 import { hopUpdateHandle } from '@main/services/hotUpdate';
+import { store } from './store';
+import { STORE_KEY } from '@publicEnum/store';
 
 let waitLoadWindow = Promise.resolve();
+const useLoadingPage = store.store.get(STORE_KEY.USE_LOADING_PAGE, true);
 
 export default class MainInit {
     public winURL: string = '';
@@ -42,7 +45,7 @@ export default class MainInit {
                 contextIsolation: false,
                 nodeIntegration: true,
                 webSecurity: false,
-                devTools: true,
+                devTools: isDevelopment,
                 scrollBounce: process.platform === 'darwin',
             }
         });
@@ -53,6 +56,7 @@ export default class MainInit {
 
         updateHandle.setMainWindow(this.mainWindow);
         hopUpdateHandle.setMainWindow(this.mainWindow);
+        store.setMainWindow(this.mainWindow);
 
         connectIpcServer(this.mainWindow);
 
@@ -63,7 +67,14 @@ export default class MainInit {
                     this.loadWindow.close();
                     this.loadWindow = null;
                 }
-                this.mainWindow!.show();
+                if (null === this.mainWindow) {
+                    return;
+                }
+                this.mainWindow.show();
+                console.log('main window show');
+                // this.mainWindow.focus();
+                app.focus();
+                console.log('main window focus');
             })
         });
 
@@ -165,8 +176,10 @@ export default class MainInit {
         });
     }
 
-    initWindow() {
-        this.createLoadingWindow();
+    async initWindow() {
+        if (useLoadingPage) {
+            this.createLoadingWindow();
+        }
         return this.createMainWindow();
     }
 }

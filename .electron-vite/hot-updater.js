@@ -4,7 +4,8 @@ const AdmZip = require('adm-zip');
 const { createHmac } = require('crypto');
 const { version, build } = require('../package.json');
 const { dump } = require('js-yaml');
-const { arch } =require('os')
+const { arch } = require('os');
+const { hotUpdate } = require('../config/config.json');
 
 const hash = (data, type = 'sha512', key = "c3e343ddff957cec09fd") => {
     const hmac = createHmac(type, key);
@@ -44,7 +45,7 @@ const main = async () => {
                 size: file.size,
             }
         });
-        await writeFile(path.join(outPutPath, 'latest.yml'), yml);
+        await writeFile(path.join(outPutPath, hotUpdate.configFileName), yml);
 
     }catch (err) {
         console.log(err);
