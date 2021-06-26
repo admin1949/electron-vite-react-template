@@ -1,14 +1,14 @@
 import { BrowserWindow } from 'electron';
 
 export class BaseServices<T> {
-    private mainWindow: BrowserWindow | null = null;
+    mainWindow: BrowserWindow | null = null;
     private signalName: string = '';
 
     constructor(signalName: string =  'baseServicesSignalName') {
         this.signalName = signalName;
     }
 
-    public setMainWindow(mainWindow: BrowserWindow) {
+    public setMainWindow(mainWindow: BrowserWindow | null) {
         this.mainWindow = mainWindow;
         return this;
     }

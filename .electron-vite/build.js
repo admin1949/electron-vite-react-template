@@ -7,6 +7,7 @@ const path = require('path');
 const rollup = require('rollup');
 const { compileFile } = require('bytenode');
 const { emptyDir } = require('fs-extra');
+const del = require('del')
 
 const { default: nodeResolve } = require("@rollup/plugin-node-resolve");
 const commonjs = require('@rollup/plugin-commonjs');
@@ -25,10 +26,7 @@ const Multispinner = require('multispinner');
 main();
 
 async function main(){
-    await Promise.all([
-        emptyDir(resolve('dist')),
-        emptyDir(resolve('build')),
-    ]);
+    del(['dist/electron/*', 'build/*', '!build/icons' ]);
     const tasks = ['main', 'render'];
     const mulitTask = new Multispinner(tasks, {
         preText: 'building',

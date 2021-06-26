@@ -66,7 +66,7 @@ class Update {
         })
     }
     
-    setMainWindow(mainWindow: BrowserWindow) {
+    setMainWindow(mainWindow: BrowserWindow | null) {
         this.mainWindow = mainWindow;
     }
 

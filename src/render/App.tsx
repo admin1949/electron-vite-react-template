@@ -1,26 +1,31 @@
-import React, { useState, forwardRef, useContext, useEffect } from 'react';
-import { Switch, Route, Link, NavLink, LinkProps } from 'react-router-dom';
+import React, { useState, forwardRef, useEffect } from 'react';
+import { Switch, Route, NavLink } from 'react-router-dom';
 import { Home } from '@render/pages/Home';
 import { Setting } from '@render/pages/Setting';
 import { Topics } from '@render/pages/Topics';
 import { Blogs } from '@render/pages/Blogs';
-import { Layout, Divider, Typography  } from 'antd';
+import { Layout, Divider } from 'antd';
 import { RobotOutlined, HomeOutlined, EuroCircleOutlined, ClockCircleOutlined, DeploymentUnitOutlined, ControlOutlined } from '@ant-design/icons';
 import style from './App.module.less';
 import { HotUpdateContenx, registHotUpdateEvent } from './tools/update';
 import { HOT_UPDATE_STATUS } from '@publicEnum/update';
+import { useTypedDispatch } from './store';
+import { createInitLoadingPageAction } from './store/loadingPage/actions';
+import { createInitTaryExitAction } from './store/taryExit/actions';
 
 const { Sider, Content } = Layout;
 
-
 export const App = () => {
     const [status, setStatus] = useState(HOT_UPDATE_STATUS.SUCCESS);
+    const dispatch = useTypedDispatch();
     useEffect(() => {
         console.log('app render');
         registHotUpdateEvent(setStatus);
+        dispatch(createInitLoadingPageAction());
+        dispatch(createInitTaryExitAction());
     }, []);
     return <HotUpdateContenx.Provider value={status}>
-         <Layout style={{height: '100%', backgroundColor: '#fff'}}>
+        <Layout style={{height: '100%', backgroundColor: '#fff'}}>
             <Sider theme='dark'>
                 <NavBar></NavBar>
             </Sider>

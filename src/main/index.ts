@@ -2,6 +2,8 @@ import { app } from 'electron';
 import MainInit from './services/windowManager';
 import electronLog, { transports } from 'electron-log';
 import { resolve } from 'path';
+import { STORE_KEY } from '@publicEnum/store';
+import { store } from './services/store';
 
 transports.file.resolvePath = () => resolve(app.getAppPath(), 'logs/main.log');
 
@@ -23,7 +25,10 @@ function onAppReady() {
 app.isReady() ? onAppReady() : app.on('ready', onAppReady);
 
 app.on('window-all-closed', () => {
-    app.quit();
+    const USE_TARY_EXIT = store.store.get(STORE_KEY.USE_TARY_EXIT, true);
+    if (!USE_TARY_EXIT) {
+        app.exit();
+    }
 });
 
 app.on('browser-window-created', () => {

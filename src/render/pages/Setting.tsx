@@ -1,15 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import style from './Setting.module.less';
-import { Typography, List, Switch, Button, message, Modal } from 'antd';
-import { HOT_UPDATE_SIGNAL, HOT_UPDATE_STATUS } from '@publicEnum/update';
-const { ipcRenderer } = require('electron');
+import { Typography, List, Switch, Button } from 'antd';
+import { HOT_UPDATE_STATUS } from '@publicEnum/update';
 import { HotUpdateContenx, hotUpdateRelaunch } from '@render/tools/update';
-import { STORE_KEY } from "@publicEnum/store";
-import { STORE_SIGNAL } from "@publicEnum/store";
+import { useTypedSelector, useTypedDispatch } from "@render/store";
+import { createToggleLoadingPageAction } from "@render/store/loadingPage/actions";
+import { createToggleTaryExitAction } from "@render/store/taryExit/actions";
 
-const USE_LOADING_PAGE = await ipcRenderer.invoke(STORE_SIGNAL.GET_VALUE, [STORE_KEY.USE_LOADING_PAGE, true])
 
-const { Title, Text  } = Typography;
+const { Text  } = Typography;
 
 export const Setting = () => {
     const update = () => {
@@ -17,15 +16,21 @@ export const Setting = () => {
             hotUpdateRelaunch();
             return;
         }
-        ipcRenderer.invoke(HOT_UPDATE_SIGNAL.CHECK_HOT_UPDATE);
     }
+    const useLoadingPage = useTypedSelector(state => state.loadingPage);
+    const useTaryExit = useTypedSelector(state => state.taryExit);
+    const dispatch = useTypedDispatch();
+
+    const toggleLoadingPage = () => {
+        dispatch(createToggleLoadingPageAction(!useLoadingPage.isOpen));
+    }
+
+    const toggleTaryExit = () => {
+        dispatch(createToggleTaryExitAction(!useTaryExit.isOpen));
+    }
+
     const val = useContext(HotUpdateContenx);
-    const [ useLoadingPage, setUseLoadingPage ] = useState(USE_LOADING_PAGE as boolean);
-    const changeUseLoadingPageToStore = () => {
-        const newStatus = !useLoadingPage
-        ipcRenderer.invoke(STORE_SIGNAL.SET_VALUE, [STORE_KEY.USE_LOADING_PAGE, newStatus]);
-        setUseLoadingPage(newStatus);
-    }
+
     const isCheckUpdate = [
         HOT_UPDATE_STATUS.HAS_NEW_VERSION,
         HOT_UPDATE_STATUS.START_DOWNLOAD,
@@ -39,11 +44,14 @@ export const Setting = () => {
         <List
             bordered
             size="large"
-            
         >
             <List.Item>
                 <Text>开屏动画</Text>
-                <Switch checked={useLoadingPage} onChange={changeUseLoadingPageToStore}></Switch>
+                <Switch checked={useLoadingPage.isOpen} loading={useLoadingPage.loading} onChange={toggleLoadingPage}></Switch>
+            </List.Item>
+            <List.Item>
+                <Text>关闭窗口时保留至系统托盘</Text>
+                <Switch checked={useTaryExit.isOpen} loading={useTaryExit.loading} onChange={toggleTaryExit}></Switch>
             </List.Item>
             <List.Item>
                 <Text>在线更新</Text>
@@ -51,4 +59,9 @@ export const Setting = () => {
             </List.Item>
         </List>
     </div>
+}
+
+// 阻止系统关闭窗口时的默认行为，由主进程判断是否退出程序
+window.onbeforeunload = e => {
+    e.returnValue = false;
 }
