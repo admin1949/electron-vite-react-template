@@ -2,6 +2,11 @@ import React from "react";
 import { DesktopMsg } from '@render/tools/notification';
 import {HOT_UPDATE_SIGNAL  } from '@publicEnum/update';
 const { ipcRenderer } = require('electron');
+import { Button, Typography } from 'antd';
+
+const crash = () => {
+    process.crash();
+}
 
 export const Home = () => {
     const hotUpdate = () => {
@@ -20,10 +25,12 @@ export const Home = () => {
             body: '测试内容'
         }).then(openMainProcessDialog);
     }
-    return <>
-        <h1>welcome to the react</h1>
-        <button onClick={hotUpdate} type="button">hot update</button><br/>
-        <button onClick={notification} type="button">notification</button><br/>
-        <button onClick={openMainProcessDialog} type="button">dialog main process</button>
-    </>
+
+    return <div>
+        <Typography.Title level={2}>常用功能</Typography.Title>
+        <Button type="primary" shape="round" size="large" onClick={hotUpdate}>热更新</Button>
+        <Button type="primary" shape="round" size="large" onClick={notification}>发送通知</Button>
+        <Button type="primary" shape="round" size="large" onClick={openMainProcessDialog}>创建弹窗</Button>
+        <Button type="primary" shape="round" size="large" onClick={crash}>模拟崩溃</Button>
+    </div>
 }

@@ -8,6 +8,7 @@
     "publish": "node ./.electron-vite/build.js && electron-builder",
     "build:win64": "node ./.electron-vite/build.js && electron-builder --win --x64",
     "build:win32": "node ./.electron-vite/build.js && electron-builder --win --ia32",
+    "test": "electron-builder --win --x64",
     "dev": "node ./.electron-vite/dev-runtime.js"
   },
   "build": {

@@ -1,22 +1,22 @@
 import React, { useState } from "react";
 import { Modal, Button } from 'antd';
 import { MarkdownEditer } from '@render/components/MarkdownEditer';
+import { FullScreenModal } from '@render/components/FullscreenModal';
 
 export const Blogs = () => {
     const [isShowMarkdownEditer, setIsShowMarkdownEditer] = useState(false);
     return <>
         <h1>Blogs</h1>
         <Button onClick={() => setIsShowMarkdownEditer(true)}>新建</Button>
-        <Modal
-            visible={isShowMarkdownEditer}
+        <FullScreenModal
             onOk={() => setIsShowMarkdownEditer(false)}
             onCancel={() => setIsShowMarkdownEditer(false)}
-            width="calc(100vw - 200px)"
-            mask={false}
-            style={{ height: '100vh', left: '200px', top: 0, margin: 0 }}
+            visible={isShowMarkdownEditer}
             title="新建文档"
+            fullScreen
         >
             <MarkdownEditer></MarkdownEditer>
-        </Modal>
+        </FullScreenModal>
     </>
 }
+

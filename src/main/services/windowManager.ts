@@ -1,7 +1,6 @@
 import { app, BrowserWindow, Menu, dialog } from 'electron';
 import { winURL, loadURL, isDevelopment } from '../config/staticPath';
 import { menuConfig } from '../config/menu';
-import { MessageBoxOptions } from 'electron/common';
 import { ipcServices } from './ipcMain';
 import { updateHandle } from './checkUpdate';
 import { hopUpdateHandle } from '@main/services/hotUpdate';
@@ -63,9 +62,7 @@ export default class MainInit {
         ipcServices.setMainWindow(this.mainWindow);
         renderProcessErrorServices.setMainWindow(this.mainWindow);
 
-        console.log(1111)
         this.mainWindow.webContents.once('dom-ready', () => {
-            console.log('dome ready')
             waitLoadWindow.finally(() => {
                 if (null !== this.loadWindow) {
                     this.loadWindow.close();

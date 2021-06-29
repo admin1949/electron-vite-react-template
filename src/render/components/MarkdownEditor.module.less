@@ -1,7 +1,7 @@
 .content{
     display: flex;
     flex-direction: row;
-    height: calc(100vh - 156px);
+    height: calc(100vh - 168px);
     font-size: 16px;
     .editor{
         flex: 1;
@@ -11,11 +11,13 @@
         :global(.CodeMirror) {
             height: auto;
         }
+        overflow: auto;
     }
     .result{
         flex: 1;
         background-color: #fafbfc;
         padding-left: 12px;
         width: 0;
+        overflow: auto;
     }
 }

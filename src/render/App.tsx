@@ -1,5 +1,5 @@
 import React, { useState, forwardRef, useEffect } from 'react';
-import { Switch, Route, NavLink } from 'react-router-dom';
+import { Switch, Route, NavLink, Redirect } from 'react-router-dom';
 import { Home } from '@render/pages/Home';
 import { Setting } from '@render/pages/Setting';
 import { Topics } from '@render/pages/Topics';
@@ -12,6 +12,7 @@ import { HOT_UPDATE_STATUS } from '@publicEnum/update';
 import { useTypedDispatch } from './store';
 import { createInitLoadingPageAction } from './store/loadingPage/actions';
 import { createInitTaryExitAction } from './store/taryExit/actions';
+import { SystemInfo } from '@render/components/SystemInfo';
 
 const { Sider, Content } = Layout;
 
@@ -29,25 +30,30 @@ export const App = () => {
             <Sider theme='dark'>
                 <NavBar></NavBar>
             </Sider>
-            <Content style={{padding: '4px'}}>
-            <h1>this is old project</h1>
-                <Switch>
-                    <Route path="/setting">
-                        <Setting/>
-                    </Route>
-                    <Route path="/clock">
-                        <Topics/>
-                    </Route>
-                    <Route path="/blogs">
-                        <Blogs/>
-                    </Route>
-                    <Route path="/test">
-                        test 2233
-                    </Route>
-                    <Route path="/">
-                        <Home/>
-                    </Route>
-                </Switch>
+            <Content style={{padding: '4px', display: 'flex'}}>
+                <SystemInfo></SystemInfo>
+                <div style={{flex: 1, padding: '25px'}}>
+                    <Switch>
+                        <Route path="/setting">
+                            <Setting/>
+                        </Route>
+                        <Route path="/clock">
+                            <Topics/>
+                        </Route>
+                        <Route path="/blogs">
+                            <Blogs/>
+                        </Route>
+                        <Route path="/test">
+                            test 2233
+                        </Route>
+                        <Route path="/home">
+                            <Home/>
+                        </Route>
+                        <Route path="/">
+                            <Redirect to='/home'></Redirect>
+                        </Route>
+                    </Switch>
+                </div>
             </Content>
         </Layout>
     </HotUpdateContenx.Provider>
